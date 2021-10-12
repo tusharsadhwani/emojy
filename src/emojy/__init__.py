@@ -1,5 +1,5 @@
 """emojy: Write Python with emojis!"""
-from textwrap import dedent
+import sys
 from typing import List
 
 import tokenize_rt
@@ -38,7 +38,10 @@ def run_emojy(emoji_code: str) -> None:
 
 def cli() -> None:
     """CLI interface"""
-    print("Emojy!")
+    filename = sys.argv[1]
+    with open(filename) as file:
+        emoji_code = file.read()
+        run_emojy(emoji_code)
 
 
 def main() -> None:
