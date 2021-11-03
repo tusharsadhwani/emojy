@@ -11,17 +11,26 @@ def de_emojify(emoji_code: str) -> str:
     """Convert emojified Python into regular Python"""
     converted_tokens: List[tokenize_rt.Token] = []
 
+    unresolved_text = ""
     for token in tokenize_rt.src_to_tokens(emoji_code):
         if token.name == "STRING":
             converted_tokens.append(token)
             continue
 
         src_list: List[str] = []
-        for char in token.src:
-            if char in EMOJI_TABLE:
-                src_list.append(EMOJI_TABLE[char])
-            else:
-                src_list.append(char)
+        text = token.src
+        # TODO: we need to check if the current text could be the part of an emoji sequence.
+        # if yes, we add it to unresolved_text, and keep getting more tokens as long as
+        # any of the existing tokens start with unresolved_text.
+        # if we find a match, we resolve it.
+        # if it no longer matches any key in emoji table, we just add it as-is.
+        # in both cases, we empty unresolved text at the end.
+        for emoji in EMOJI_TABLE:
+            if emoji == text:
+                src_list.append(EMOJI_TABLE[text])
+                break
+        else:
+            src_list.append(text)
 
         new_src = "".join(src_list)
         converted_token = tokenize_rt.Token._replace(token, src=new_src)
